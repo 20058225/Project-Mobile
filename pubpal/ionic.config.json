@@ -1,0 +1,7 @@
+{
+  "name": "pubpal",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
