@@ -1,26 +1,25 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { PosComponent } from './pos/pos.component';
 
 const routes: Routes = [
   {
     path: '',
     redirectTo: 'home',
-    pathMatch: 'full'
-  },
-  {
-    path: 'home',
-    loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
+    pathMatch: 'full'  // Ensure full path matching
   },
   {
     path: 'pos',
-    loadChildren: () => import('./pos/pos.module').then( m => m.PosPageModule)
+    component: PosComponent
   },
+  {
+    path: '**',
+    redirectTo: 'pos'  // Fallback route for unmatched paths
+  }
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
-  ],
+  imports: [ RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

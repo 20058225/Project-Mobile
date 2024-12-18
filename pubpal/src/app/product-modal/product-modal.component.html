@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ categoryName }} Products</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list *ngIf="products.length > 0">
+    <ion-item *ngFor="let product of products">
+      <ion-label (click)="toggleProduct(product)">
+        <h2>{{ product.name }} - €{{ product.price.toFixed(2) }}</h2>
+      </ion-label>
+      <ion-buttons slot="end">
+        <ion-button fill="clear" size="small" (click)="decrementQuantity(product)">-</ion-button>
+        <ion-label>{{ product.quantity || 0 }}</ion-label>
+        <ion-button fill="clear" size="small" (click)="incrementQuantity(product)">+</ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+
+  <ion-item *ngIf="products.length === 0">
+    <ion-label>No products available in this category.</ion-label>
+  </ion-item>
+</ion-content>

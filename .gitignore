@@ -3,3 +3,8 @@ pubpal/.vscode/extensions.json
 /pubpal/.vscode
 pubpal/package.json
 pubpal/package-lock.json
+/node_modules
+package-lock.json
+package.json
+pubpal/r.sh
+pubpal/run.sh

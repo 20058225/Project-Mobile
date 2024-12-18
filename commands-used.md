@@ -10,8 +10,8 @@ sudo npm install -g @ionic/cli
 
 ionic start pubpal blank --type=angular
 ionic serve
-ionic capacitor run android
 ionic generate page login
+ionic generate component pos
 
 ##
 # Plugins   
@@ -30,12 +30,14 @@ npm install @ionic-native/file
 ##
 # Splash Screen
 * Install   
-ionic cordova plugin add cordova-plugin-splashscreen    
-npm install @ionic-native/splash-screen
+npm install @capacitor/splash-screen
+npx cap sync
+
 
 * Icons 
-ionic cordova resources
+npm install @capacitor-community/app-icon
 
 * Android
-ionic cordova build android
+npx cap sync android
+npx cap open android
 
