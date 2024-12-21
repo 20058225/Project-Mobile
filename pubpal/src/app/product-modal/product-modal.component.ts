@@ -19,19 +19,23 @@ export class ProductModalComponent {
   
   toggleProduct(product: any) {
     if (product.quantity && product.quantity > 0) {
-      product.quantity ++;
+      product.quantity++;
     } else {
       product.quantity = 1;
     }
   }
-
   incrementQuantity(product: any) {
     product.quantity = (product.quantity || 0) + 1;
-  }
-  
+  }  
   decrementQuantity(product: any) {
     if (product.quantity > 0) {
       product.quantity--;
     }
+  }
+  // Function to plugin vibration
+  async pluginVibration() {
+    const { Haptics } = await import('@capacitor/haptics');
+    await Haptics.vibrate();
+    console.log("Vibrate!!");
   }
 }

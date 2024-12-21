@@ -8,3 +8,7 @@ package-lock.json
 package.json
 pubpal/r.sh
 pubpal/run.sh
+/pubpal/resources/ios/splash
+/pubpal/resources/ios/icon
+/pubpal/resources/android/splash
+/pubpal/resources/android/icon

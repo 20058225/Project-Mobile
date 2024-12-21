@@ -11,7 +11,7 @@ sudo npm install -g @ionic/cli
 ionic start pubpal blank --type=angular
 ionic serve
 ionic generate page login
-ionic generate component pos
+ionic generate component receiptmodal
 
 ##
 # Plugins   
@@ -23,9 +23,11 @@ npm install @ionic-native/vibration
 ionic cordova plugin add cordova-plugin-contacts    
 npm install @ionic-native/contacts
 
+
 * File Manager  
-ionic cordova plugin add cordova-plugin-file    
-npm install @ionic-native/file
+npm install @capacitor/filesystem
+npx cap sync
+
 
 ##
 # Splash Screen

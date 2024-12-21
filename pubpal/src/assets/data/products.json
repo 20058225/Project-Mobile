@@ -60,10 +60,10 @@
     { "id": 52, "name": "Prosecco Bottle", "price": 35.00, "category": "Wine" },
     { "id": 53, "name": "Prosecco Glass", "price": 10.50, "category": "Wine" },
     
-    { "id": 54, "name": "Tea", "price": 2.50, "category": "HotDrinks" },
-    { "id": 55, "name": "Coffee", "price": 3.00, "category": "HotDrinks" },
-    { "id": 56, "name": "Irish Coffee", "price": 6.00, "category": "HotDrinks" },
-    { "id": 57, "name": "Hot Whiskey", "price": 6.00, "category": "HotDrinks" },
+    { "id": 54, "name": "Tea", "price": 2.50, "category": "Hot-Drinks" },
+    { "id": 55, "name": "Coffee", "price": 3.00, "category": "Hot-Drinks" },
+    { "id": 56, "name": "Irish Coffee", "price": 6.00, "category": "Hot-Drinks" },
+    { "id": 57, "name": "Hot Whiskey", "price": 6.00, "category": "Hot-Drinks" },
 
     { "id": 58, "name": "Jameson", "price": 7.50, "category": "Whiskeys" },
     { "id": 59, "name": "Tullamore", "price": 7.50, "category": "Whiskeys" },
