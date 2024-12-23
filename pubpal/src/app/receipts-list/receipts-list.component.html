@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Receipts List</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list *ngIf="receipts && receipts.length > 0; else noReceipts">
+    <ion-item *ngFor="let receipt of receipts">
+      <ion-label>
+        <h2>Receipt: {{ receipt.id }} | Total: €{{ receipt.total }}</h2>
+        <p>Date: {{ receipt.timestamp | date:'dd/MM/yyyy HH:mm' }}</p>
+        <p>Payment Method: {{ receipt.paymentMethod }}</p> 
+        <ion-list>
+          <ion-item *ngFor="let product of receipt.products">
+            <ion-label>
+              {{ product.name }} x {{ product.quantity }} &#64; €{{ product.price }} each
+            </ion-label>
+            <ion-note slot="end">€{{ product.total }}</ion-note>
+          </ion-item>
+        </ion-list>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+  <ng-template #noReceipts>
+    <div class="no-receipts">
+      <p>No receipts available.</p>
+    </div>
+  </ng-template>
+</ion-content>

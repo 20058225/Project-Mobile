@@ -1,84 +1,79 @@
 <ion-header>
-	<ion-toolbar>
-	  <ion-title>PubPal POS System</ion-title>
-	</ion-toolbar>
+    <ion-toolbar>
+      <ion-title>PubPal POS System</ion-title>
+    </ion-toolbar>
   </ion-header>
   
   <ion-content>
-	<!-- Category Buttons in a 3-Column Grid -->
-	<ion-grid>
-	  <ion-row>
-		<ion-col size="4" *ngFor="let category of categories">
-		  <ion-button 
-			expand="block" 
-			(click)="openProductModal(category)" 
-			[title]="'Select ' + category">
-			{{ category }}
-		  </ion-button>
-		</ion-col>
-	  </ion-row>
-	</ion-grid>
+    <!-- Category Buttons in a 3-Column Grid -->
+    <ion-grid>
+      <ion-row>
+        <ion-col size="4" *ngFor="let category of categories">
+          <ion-button expand="block" 
+            (click)="openProductModal(category)" 
+            [title]="'Select ' + category">{{ category }}</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   
-	<!-- Selected Products -->
-	<ion-card *ngIf="selectedProductsList.length > 0">
-	  <ion-card-header>
-		<ion-card-title>Selected Products</ion-card-title>
-	  </ion-card-header>
-	  <ion-card-content>
-		<ion-row>
-		  <ion-col size="3"><strong>Name</strong></ion-col>
-		  <ion-col size="4"><strong>Qty</strong></ion-col>
-		  <ion-col size="2"><strong>Price</strong></ion-col>
-		  <ion-col size="2"><strong>Total</strong></ion-col>
-		  <ion-col size="1"><strong></strong></ion-col>
-		</ion-row>
+    <!-- Selected Products -->
+    <ion-card *ngIf="selectedProductsList.length > 0">
+      <ion-card-header>
+        <ion-card-title>Selected Products</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-row>
+          <ion-col size="3"><strong>Name</strong></ion-col>
+          <ion-col size="4"><strong>Qty</strong></ion-col>
+          <ion-col size="2"><strong>Price</strong></ion-col>
+          <ion-col size="2"><strong>Total</strong></ion-col>
+          <ion-col size="1"><strong></strong></ion-col>
+        </ion-row>
   
-		<ion-row *ngFor="let product of selectedProductsList">
-		  <ng-container *ngIf="product.quantity > 0">
-			<ion-col size="3">{{ product.name }}</ion-col>
-			<ion-col size="4">
-			  <ion-button fill="clear" size="small" (click)="decrementQuantity(product)">-</ion-button>
-			  {{ product.quantity }}
-			  <ion-button fill="clear" size="small" (click)="incrementQuantity(product)">+</ion-button>
-			</ion-col>
-			<ion-col size="2">€{{ product.price.toFixed(2) }}</ion-col>
-			<ion-col size="2">€{{ (product.price * product.quantity).toFixed(2) }}</ion-col>
-			<ion-col size="1">
-			  <ion-button fill="outline" color="danger" size="small" (click)="removeProduct(product)">
-				x
-			  </ion-button>
-			</ion-col>
-		  </ng-container>
-		</ion-row>
+        <ion-row *ngFor="let product of selectedProductsList">
+          <ng-container *ngIf="product.quantity > 0">
+            <ion-col size="3">{{ product.name }}</ion-col>
+            <ion-col size="4">
+              <ion-button fill="clear" size="small" (click)="decrementQuantity(product)">-</ion-button>
+              {{ product.quantity }}
+              <ion-button fill="clear" size="small" (click)="incrementQuantity(product)">+</ion-button>
+            </ion-col>
+            <ion-col size="2">€{{ product.price.toFixed(2) }}</ion-col>
+            <ion-col size="2">€{{ (product.price * product.quantity).toFixed(2) }}</ion-col>
+            <ion-col size="1">
+              <ion-button fill="outline" color="danger" size="small" 
+              (click)="removeProduct(product); pluginVibration()">x</ion-button>
+            </ion-col>
+          </ng-container>
+        </ion-row>
   
-		<!-- Total Amount -->
-		<ion-row class="total-row">
-		  <ion-col size="6">
-			<strong>Total Amount:</strong>
-		  </ion-col>
-		  <ion-col size="6" class="ion-text-end">
-			<strong>€{{ totalAmount.toFixed(2) }}</strong>
-		  </ion-col>
-		</ion-row>
-	  </ion-card-content>
-	</ion-card>
+        <!-- Total Amount -->
+        <ion-row class="total-row">
+          <ion-col size="6">
+            <strong>Total Amount:</strong>
+          </ion-col>
+          <ion-col size="6" class="ion-text-end">
+            <strong>€{{ totalAmount.toFixed(2) }}</strong>
+          </ion-col>
+        </ion-row>
+      </ion-card-content>
+    </ion-card>
   
-	<!-- Payment Buttons at the End -->
-	<div class="payment-buttons" *ngIf="totalAmount > 0 && showFooter">
-	  <ion-row class="ion-justify-content-center">
-		<ion-col size="6">
-		  <ion-button expand="block" color="primary" (click)="selectPayment('cash'); pluginVibration()">Cash</ion-button>
-		</ion-col>
-		<ion-col size="6">
-		  <ion-button expand="block" color="secondary" (click)="selectPayment('card'); pluginVibration()">Card</ion-button>
-		</ion-col>
-	  </ion-row>
-	  <ion-row *ngIf="selectedPayment">
-		<ion-col>
-		  <ion-button expand="block" color="tertiary" (click)="showReceiptModal(); pluginVibration()">
-			Finish Order
-		  </ion-button>
-		</ion-col>
-	  </ion-row>
-	</div>
+    <!-- Payment Buttons at the End -->
+    <div class="payment-buttons" *ngIf="totalAmount > 0 && showFooter">
+      <ion-row class="ion-justify-content-center">
+        <ion-col size="6">
+          <ion-button expand="block" color="primary" (click)="selectPayment('cash')">Cash</ion-button>
+        </ion-col>
+        <ion-col size="6">
+          <ion-button expand="block" color="secondary" (click)="selectPayment('card')">Card</ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row *ngIf="selectedPayment">
+        <ion-col>
+          <ion-button expand="block" color="tertiary" (click)="pluginVibration(); showToast('Order generated successfully.', 'bottom'); printReceipt()">
+            Finish Order</ion-button>
+        </ion-col>
+      </ion-row>
+    </div>
   </ion-content>

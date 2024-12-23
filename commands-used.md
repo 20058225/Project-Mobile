@@ -19,11 +19,6 @@ ionic generate component receiptmodal
 ionic cordova plugin add cordova-plugin-vibration   
 npm install @ionic-native/vibration
 
-* Contacts  
-ionic cordova plugin add cordova-plugin-contacts    
-npm install @ionic-native/contacts
-
-
 * File Manager  
 npm install @capacitor/filesystem
 npx cap sync
@@ -42,4 +37,3 @@ npm install @capacitor-community/app-icon
 * Android
 npx cap sync android
 npx cap open android
-

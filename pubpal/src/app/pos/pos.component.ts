@@ -2,23 +2,41 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ModalController } from '@ionic/angular';
 import { ProductModalComponent } from '../product-modal/product-modal.component';
-import { ReceiptModalComponent } from '../receipt-modal/receipt-modal.component';
 import { Platform } from '@ionic/angular'; 
+import { ToastController } from '@ionic/angular';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+
+import { Plugins } from '@capacitor/core';
+const { Permissions } = Plugins;
+
+async function requestPermission() {
+  const { granted } = await Permissions['request']({
+    name: 'storage',
+  });
+  if (!granted) {
+    console.error('Permission denied!');
+    return;
+  }
+}
 
 @Component({
   selector: 'app-pos',
   templateUrl: './pos.component.html',
   styleUrls: ['./pos.component.scss']
 })
-export class PosComponent implements OnInit {
-  products: any[] = []; // Full list of products from JSON
-  categories: string[] = []; // Product categories
-  selectedProductsList: any[] = []; // Selected products in POS
-  totalAmount: number = 0; // Total price of selected products
 
+export class PosComponent implements OnInit {
+  products: any[] = []; //@@ products JSON
+  categories: string[] = []; //@@ Product categories
+  selectedProductsList: any[] = []; //@@ Selected products in POS
+  totalAmount: number = 0; //@@ Total price of selected products
   showFooter: boolean = true;
 
-  constructor(private http: HttpClient, private modalCtrl: ModalController, private platform: Platform) { }
+  constructor(
+    private http: HttpClient, 
+    private modalCtrl: ModalController, 
+    private platform: Platform, 
+    private toastController: ToastController) { }
 
   ngOnInit() { this.loadProducts(); }
 
@@ -26,11 +44,10 @@ export class PosComponent implements OnInit {
     this.http.get<any>('assets/data/products.json').subscribe(data => {
       this.products = data.products;
       this.categories = [...new Set(this.products.map(p => p.category))];
-      //console.log('Loaded products:', this.products);
     });
   }
 
-  modalOpen = false;
+  //modalOpen = false;
   async openProductModal(category: string) {
     const filteredProducts = this.products.filter(p => p.category === category);
 
@@ -44,14 +61,15 @@ export class PosComponent implements OnInit {
 
     modal.onDidDismiss().then((result) => {
       if (result.data) {
-        result.data.forEach((product: any) => {
-          this.addOrUpdateProduct(product);
-        });    
+        result.data.forEach((product: any) => this.addOrUpdateProduct(product));    
         this.calculateTotal();  
       }
     });
     await modal.present();
   }
+
+  dismiss() { this.modalCtrl.dismiss(this.products); }
+
   addOrUpdateProduct(product: any) {
     const existingProduct = this.selectedProductsList.find(p => p.name === product.name);
     if (existingProduct) {
@@ -61,16 +79,7 @@ export class PosComponent implements OnInit {
     }
   }
 
-  dismiss() { this.modalCtrl.dismiss(this.products); }
-
-  // Increment product quantity
-  incrementQuantity(product: any) {
-    if (!product.price) {
-      product.price = 0;
-      console.warn('Product price is missing. Setting it to €0.', product);
-      return;
-    }
-    
+  incrementQuantity(product: any) { 
     const existingProduct = this.selectedProductsList.find(p => p.name === product.name);
   
     if (existingProduct) { existingProduct.quantity++; } 
@@ -91,15 +100,18 @@ export class PosComponent implements OnInit {
       this.calculateTotal();
     }
   }
+
   calculateTotal() {
     this.totalAmount = this.selectedProductsList.reduce((sum, product) => {
       return sum + (product.price * product.quantity);
     }, 0);
   }
+
   getProductQuantity(product: any): number {
     const existingProduct = this.selectedProductsList.find(p => p.name === product.name);
     return existingProduct ? existingProduct.quantity : 0;
   }
+
   removeProduct(product: any) {
     const index = this.selectedProductsList.indexOf(product);
     if (index > -1) {
@@ -114,46 +126,113 @@ export class PosComponent implements OnInit {
     }, 0);
   }
   
-  // Function to plugin vibration
+  //@@ Function to plugin vibration
   async pluginVibration() {
     const { Haptics } = await import('@capacitor/haptics');
     await Haptics.vibrate();
     console.log("Vibrate!!");
   }
-  selectedPayment: string | null = null; // Store the selected payment method
 
-  // Method to handle payment selection
+  async createReceiptsDirectory() {
+    try {
+      await Filesystem.stat({
+        directory: Directory.Documents,
+        path: 'receipts',
+      });
+      console.log('Receipts directory already exists.');
+    } catch (error: any) {
+      if (error.message.includes('does not exist')) {
+        try {
+          await Filesystem.mkdir({
+            directory: Directory.Documents,
+            path: 'receipts',
+          });
+          console.log('Receipts directory created successfully.');
+        } catch (mkdirError) {
+          console.error('Error creating receipts directory:', mkdirError);
+        }
+      } else {
+        console.error('Error checking receipts directory:', error);
+      }
+    }
+  }  
+  
+  selectedPayment: string | null = null;
+
+  //@@ Method to handle payment selection
   selectPayment(method: string) {
     this.selectedPayment = method;
     console.log(`Payment selected: ${method}`);
   }
 
-  // Method to print the receipt
-  printReceipt() {
-    const receiptContent = this.selectedProductsList.map(product => {
-      return `${product.name} x${product.quantity} @ €${product.price.toFixed(2)} = €${(product.price * product.quantity).toFixed(2)}`;
-    }).join('\n');
-
-    const totalLine = `Total: €${this.totalAmount.toFixed(2)}`;
-    const receipt = `--- Receipt ---\n${receiptContent}\n${totalLine}`;
-    
-    console.log(receipt);
-    //alert(receipt); // Replace with actual receipt printing logic
-  }
+  //@@ Method to save the receipts
+  async printReceipt() {
+    const receiptContent = this.selectedProductsList.map(product => ({
+      name: product.name,
+      quantity: product.quantity,
+      price: product.price,
+      total: (product.price * product.quantity).toFixed(2),
+    }));
   
-  async showReceiptModal() {
-    const modal = await this.modalCtrl.create({
-      component: ReceiptModalComponent,
-      componentProps: {
-        orderDetails: {
-          orderNumber: Math.floor(Math.random() * 1000000), // Generate random order number
-          items: this.selectedProductsList,
-          totalAmount: this.totalAmount,
-          paymentMethod: 'Cash/Card' 
-        }
+    const totalAmount = this.totalAmount.toFixed(2);
+    const receipt = {
+      id: new Date().getTime().toString(),
+      products: receiptContent,
+      total: totalAmount,
+      timestamp: new Date().toISOString(),
+      paymentMethod: this.selectedPayment,
+    };
+  
+    const filename = 'receipts.json';
+  
+    try {
+      await this.createReceiptsDirectory();
+  
+      let existingReceipts: any[] = [];
+      try {
+        const readResult = await Filesystem.readFile({
+          path: `receipts/${filename}`,
+          directory: Directory.Documents,
+        });
+  
+        console.log('File content read before update:', readResult.data);
+        const data = typeof readResult.data === 'string' ? readResult.data : await readResult.data.text();
+        existingReceipts = JSON.parse(data);
+      } catch (readError) {
+        console.log('No existing receipts found, starting fresh.', readError);
       }
-    });
   
-    await modal.present();
+      existingReceipts.push(receipt);
+  
+      await Filesystem.writeFile({
+        path: `receipts/${filename}`,
+        directory: Directory.Documents,
+        data: JSON.stringify(existingReceipts),
+        encoding: Encoding.UTF8,
+      });
+  
+      const verifyWrite = await Filesystem.readFile({
+        path: `receipts/${filename}`,
+        directory: Directory.Documents,
+      });
+      console.log('File content after write:', verifyWrite.data);
+  
+      console.log('Receipt saved successfully:', receipt);
+  
+      this.selectedProductsList = [];
+      this.totalAmount = 0;
+      this.selectedPayment = null;
+      this.showToast('Receipt saved and order completed!', 'bottom');
+    } catch (error) {
+      console.error('Error saving receipt:', error);
+    }
+  }  
+  async showToast(message: string, position: 'top' | 'middle' | 'bottom') {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 1000,
+      position: position,
+    });
+    await toast.present();
   }
 }

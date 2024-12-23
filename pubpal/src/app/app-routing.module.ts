@@ -4,17 +4,13 @@ import { PosComponent } from './pos/pos.component';
 
 const routes: Routes = [
   {
+    path: 'tabs',
+    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
+  },
+  {
     path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'  // Ensure full path matching
-  },
-  {
-    path: 'pos',
-    component: PosComponent
-  },
-  {
-    path: '**',
-    redirectTo: 'pos'  // Fallback route for unmatched paths
+    redirectTo: 'tabs',
+    pathMatch: 'full'
   }
 ];
 

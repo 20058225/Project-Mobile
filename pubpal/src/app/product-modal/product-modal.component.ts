@@ -24,9 +24,7 @@ export class ProductModalComponent {
       product.quantity = 1;
     }
   }
-  incrementQuantity(product: any) {
-    product.quantity = (product.quantity || 0) + 1;
-  }  
+  incrementQuantity(product: any) { product.quantity = (product.quantity || 0) + 1; }  
   decrementQuantity(product: any) {
     if (product.quantity > 0) {
       product.quantity--;
@@ -38,4 +36,21 @@ export class ProductModalComponent {
     await Haptics.vibrate();
     console.log("Vibrate!!");
   }
+  resetQuantities() {
+    this.products.forEach(product => {
+      if (product.quantity > 0) {
+        product.quantity = 0; // Reset quantity to 0
+      }
+    });
+  }
+  cancelBack() {
+    this.resetQuantities(); 
+    this.pluginVibration(); 
+    this.dismiss(); 
+  }
+  addBack(){
+    this.pluginVibration(); 
+    this.dismiss(); 
+  }
+  
 }

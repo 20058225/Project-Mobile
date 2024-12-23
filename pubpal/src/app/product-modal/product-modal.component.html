@@ -1,8 +1,11 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>{{ categoryName }} Products</ion-title>
+    <ion-buttons slot="start" (click)="cancelBack()">
+      <ion-back-button defaultHref="/tabs/pos"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ categoryName }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="dismiss(); pluginVibration()">close</ion-button>
+      <ion-button (click)="addBack()">Add</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
