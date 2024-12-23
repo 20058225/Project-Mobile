@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ModalController } from '@ionic/angular';
 import { ProductModalComponent } from '../product-modal/product-modal.component';
-import { Platform } from '@ionic/angular'; 
 import { ToastController } from '@ionic/angular';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { ReceiptService } from '../services/receipt.service';
 
 import { Plugins } from '@capacitor/core';
 const { Permissions } = Plugins;
@@ -31,14 +31,15 @@ export class PosComponent implements OnInit {
   selectedProductsList: any[] = []; //@@ Selected products in POS
   totalAmount: number = 0; //@@ Total price of selected products
   showFooter: boolean = true;
+  receipts: any[] = [];
 
   constructor(
     private http: HttpClient, 
     private modalCtrl: ModalController, 
-    private platform: Platform, 
-    private toastController: ToastController) { }
+    private toastController: ToastController,
+    private receiptService: ReceiptService) { }
 
-  ngOnInit() { this.loadProducts(); }
+  ngOnInit() { this.createReceiptsDirectory(),    this.loadProducts(); }
 
   loadProducts() {
     this.http.get<any>('assets/data/products.json').subscribe(data => {
@@ -195,7 +196,6 @@ export class PosComponent implements OnInit {
           directory: Directory.Documents,
         });
   
-        console.log('File content read before update:', readResult.data);
         const data = typeof readResult.data === 'string' ? readResult.data : await readResult.data.text();
         existingReceipts = JSON.parse(data);
       } catch (readError) {
@@ -210,19 +210,14 @@ export class PosComponent implements OnInit {
         data: JSON.stringify(existingReceipts),
         encoding: Encoding.UTF8,
       });
-  
-      const verifyWrite = await Filesystem.readFile({
-        path: `receipts/${filename}`,
-        directory: Directory.Documents,
-      });
-      console.log('File content after write:', verifyWrite.data);
-  
+
       console.log('Receipt saved successfully:', receipt);
-  
+      this.receiptService.updateReceipts(existingReceipts); 
+
       this.selectedProductsList = [];
       this.totalAmount = 0;
       this.selectedPayment = null;
-      this.showToast('Receipt saved and order completed!', 'bottom');
+      
     } catch (error) {
       console.error('Error saving receipt:', error);
     }
